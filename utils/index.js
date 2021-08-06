@@ -131,7 +131,7 @@ const folderDetect = (path = 'result') => {
   if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath)
 }
 
-async function touchCoserPhotosInfo(member_id, touchFile = true) {
+async function touchCoserPhotosInfo(member_id) {
   folderDetect()
   const photosNumber = await getTotalPhotosNumber(member_id)
   console.log(`總張數: ${photosNumber}`)
@@ -150,9 +150,9 @@ async function touchCoserPhotosInfo(member_id, touchFile = true) {
   }
 
   const {
-    member: { global_name, id }
+    member: { global_name }
   } = photos[0]
-  const coser = global_name || id
+  const coser = `${global_name || member_id}-${member_id}`
   const coserFolder = `result/${coser}`
   folderDetect(coserFolder)
 
