@@ -1,3 +1,4 @@
 node_modules/
 result/
 result.json
+.pnpm-debug.log

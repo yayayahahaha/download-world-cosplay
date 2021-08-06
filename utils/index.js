@@ -229,7 +229,7 @@ async function startDownload(from, targetFolder) {
   async function doDownload(list, targetFolder) {
     folderDetect(targetFolder)
 
-    const taskList = list.slice(0, 5).map(item => {
+    const taskList = list.map(item => {
       return function () {
         const { id, name, url, type } = item
         const filePath = `${targetFolder}/${name}-${id}.${type}`
