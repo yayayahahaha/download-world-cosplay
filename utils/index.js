@@ -159,7 +159,37 @@ async function touchCoserPhotosInfo(member_id, touchFile = true) {
 }
 
 function logPhotosInfo(filePath, list) {
-  fs.writeFileSync(filePath, JSON.stringify(list, null, 2))
+  const id_hash = hashCode(list.map(item => item.id).join('-'))
+  const photosNumber = list.length
+
+  const { tags } = list.reduce(
+    (info, item) => {
+      if (!item.tag_arr.length) {
+        const noTags = 'no-tags'
+        const name = noTags
+        info.tags[noTags] = info.tags['no-tags'] || { name, photos: [], length: 0 }
+        const { id: photoId, subject } = item
+        info.tags[noTags].photos.push(`${subject}-${photoId}`)
+        info.tags[noTags].length = info.tags[noTags].photos.length
+        return info
+      }
+
+      item.tag_arr.forEach(tag => {
+        const { id, name } = tag
+        info.tags[id] = info.tags[id] || { name, photos: [], length: 0 }
+
+        const { id: photoId, subject } = item
+        info.tags[id].photos.push(`${subject}-${photoId}`)
+        info.tags[id].length = info.tags[id].photos.length
+      })
+
+      return info
+    },
+    { tags: {} }
+  )
+
+  const info = { id_hash, photosNumber, tags }
+  fs.writeFileSync(filePath, JSON.stringify(info, null, 2))
 }
 
 const ds = promise => promise.then(r => [r, null]).catch(e => [null, e])

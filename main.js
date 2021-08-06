@@ -19,4 +19,6 @@ const page = 272
 const basicQuery = { limit, member_id, page }
 
 // touchCoserPhotosInfo
+touchCoserPhotosInfo(135407)
+touchCoserPhotosInfo(19139)
 touchCoserPhotosInfo(28898)
