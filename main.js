@@ -6,8 +6,7 @@
 const { fetchCoserPhotos } = require('./utils/index')
 
 // coser world-cosplay
-/*135407*/
-/*19139*/
-/*28898*/
+/*135407 // Katsurayu */
+/*19139 // Neneko */
 
-fetchCoserPhotos(19139)
+fetchCoserPhotos(135407)
