@@ -115,7 +115,7 @@ const getAllPhotosInfo = async (member_id, totalPages) => {
       sort: page
     })
   })
-  const taskNumber = 2
+  const taskNumber = 4
   const task_search = new TaskSystem(promiseList, taskNumber, { randomDelay: 1000 /*毫秒*/ })
   const promiseResult = await task_search.doPromise()
   const flatResult = promiseResult
@@ -138,10 +138,15 @@ async function touchCoserPhotosInfo(member_id, touchFile = true) {
 
   const totalPages = Math.ceil(photosNumber / maxLimit)
   console.log(`每頁 ${maxLimit} 張，總頁數: ${totalPages}`)
+  console.log('')
 
   // 這裡的就是該coser的全部照片了
   const photos = await getAllPhotosInfo(member_id, totalPages)
-  if (!touchFile || !photos.length) return photos
+  // TODO 補充 member 其他info 的取得方式
+  if (!photos.length) {
+    console.log(`id ${member_id} 沒有任何照片!`)
+    return { coser: member_id, photos }
+  }
 
   const {
     member: { global_name, id }
@@ -155,7 +160,7 @@ async function touchCoserPhotosInfo(member_id, touchFile = true) {
   fs.writeFileSync(resultFilePath, JSON.stringify(photos, null, 2))
   logPhotosInfo(logFilePath, photos)
 
-  return photos
+  return { coser, photos }
 }
 
 function logPhotosInfo(filePath, list) {
