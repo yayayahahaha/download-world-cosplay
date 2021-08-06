@@ -144,18 +144,17 @@ async function touchCoserPhotosInfo(member_id) {
   // 這裡的就是該coser的全部照片了
   const photos = await getAllPhotosInfo(member_id, totalPages)
   console.log('')
-  // TODO 補充 member 其他info 的取得方式
-  if (!photos.length) {
-    console.log(`id ${member_id} 沒有任何照片!`)
-    return { coser: member_id, photos }
-  }
 
-  const {
-    member: { global_name }
-  } = photos[0]
+  // TODO 補充 member 其他info 的取得方式
+  const { member: { global_name } = {} } = photos[0] || {}
   const coser = `${global_name || member_id}-${member_id}`
   const coserFolder = `result/${coser}`
   folderDetect(coserFolder)
+
+  if (!photos.length) {
+    console.log(`id ${member_id} 沒有任何照片!`)
+    return { coser, photos }
+  }
 
   const resultFilePath = `./${coserFolder}/result.json`
   const logFilePath = `./${coserFolder}/log.json`
@@ -261,9 +260,14 @@ async function fetchCoserPhotos(member_id) {
   const { coser } = info
   const result = await startDownload(`./result/${coser}/result.json`, `./result/${coser}/photos`)
 
+  folderDetect(`result/${coser}/error-log`)
+  if (result instanceof Error) {
+    fs.writeFileSync(`./result/${coser}/error-log/${Date.now()}.json`, JSON.stringify('沒有圖片', null, 2))
+    return true
+  }
+
   const errorLog = result.map(({ data }) => data).filter(({ result }) => !result)
   if (errorLog.length) {
-    folderDetect(`./result/${coser}/error-log`)
     fs.writeFileSync(`./result/${coser}/error-log/${Date.now()}.json`, JSON.stringify(errorLog, null, 2))
   }
 

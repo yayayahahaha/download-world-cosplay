@@ -10,4 +10,5 @@ const { fetchCoserPhotos } = require('./utils/index')
 /*135407 // Katsurayu */
 /*19139 // Neneko */
 
+// fetchCoserPhotos(1)
 fetchCoserPhotos(135407)
