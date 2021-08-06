@@ -3,6 +3,7 @@ const qs = require('qs')
 const fetch = require('node-fetch')
 const { cookie } = require('./headers')
 const { TaskSystem, download } = require('npm-flyc')
+const fs = require('fs')
 
 // CryptoJS.MD5('Test')
 // CryptoJS.SHA256('Test1')
@@ -125,4 +126,8 @@ const getAllPhotosInfo = async (member_id, totalPages) => {
   return flatResult
 }
 
-module.exports = { hashCode, createUrl, getTotalPhotosNumber, basicUrl, getAllPhotosInfo, maxLimit }
+const folderDetect = () => {
+  if (!fs.existsSync('./result/')) fs.mkdirSync('./result/')
+}
+
+module.exports = { hashCode, createUrl, getTotalPhotosNumber, basicUrl, getAllPhotosInfo, maxLimit, folderDetect }

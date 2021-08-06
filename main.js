@@ -1,7 +1,15 @@
 const fetch = require('node-fetch')
 const { TaskSystem, download } = require('npm-flyc')
 const fs = require('fs')
-const { basicUrl, hashCode, createUrl, getTotalPhotosNumber, getAllPhotosInfo, maxLimit } = require('./utils/index')
+const {
+  basicUrl,
+  hashCode,
+  createUrl,
+  getTotalPhotosNumber,
+  getAllPhotosInfo,
+  maxLimit,
+  folderDetect
+} = require('./utils/index')
 const { cookie } = require('./utils/headers')
 
 const ds = promise => promise.then(r => [r, null]).catch(e => [null, e])
@@ -15,6 +23,7 @@ const page = 272
 const basicQuery = { limit, member_id, page }
 
 const start = async function (member_id, f) {
+  folderDetect()
   const photosNumber = await getTotalPhotosNumber(member_id)
 
   const totalPages = Math.ceil(photosNumber / maxLimit)
