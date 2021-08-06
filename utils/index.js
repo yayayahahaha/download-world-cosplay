@@ -131,7 +131,7 @@ const folderDetect = (path = 'result') => {
   if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath)
 }
 
-async function touchCoserPhotos(member_id, touchFile = true) {
+async function touchCoserPhotosInfo(member_id, touchFile = true) {
   folderDetect()
   const photosNumber = await getTotalPhotosNumber(member_id)
   console.log(`總張數: ${photosNumber}`)
@@ -149,10 +149,20 @@ async function touchCoserPhotos(member_id, touchFile = true) {
   const coser = global_name || id
   const coserFolder = `result/${coser}`
   folderDetect(coserFolder)
-  fs.writeFileSync(`./${coserFolder}/result.json`, JSON.stringify(photos, null, 2))
+
+  const resultFilePath = `./${coserFolder}/result.json`
+  const logFilePath = `./${coserFolder}/log.json`
+  fs.writeFileSync(resultFilePath, JSON.stringify(photos, null, 2))
+  logPhotosInfo(logFilePath, photos)
 
   return photos
 }
+
+function logPhotosInfo(filePath, list) {
+  fs.writeFileSync(filePath, JSON.stringify(list, null, 2))
+}
+
+const ds = promise => promise.then(r => [r, null]).catch(e => [null, e])
 
 module.exports = {
   hashCode,
@@ -162,5 +172,7 @@ module.exports = {
   getAllPhotosInfo,
   maxLimit,
   folderDetect,
-  touchCoserPhotos
+  touchCoserPhotosInfo,
+  logPhotosInfo,
+  ds
 }
