@@ -32,8 +32,10 @@ const basicQuery = { limit, member_id, page }
     })
   })
 
-  const taskNumber = 40
-  const task_search = new TaskSystem(promiseList, taskNumber)
+  const taskNumber = 2
+  const task_search = new TaskSystem(promiseList, taskNumber, {
+    randomDelay: 3000 // 毫秒
+  })
   const promiseResult = await task_search.doPromise()
   const flatResult = promiseResult
     .map(({ data }) => data)
