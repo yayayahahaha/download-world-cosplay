@@ -142,6 +142,7 @@ async function touchCoserPhotosInfo(member_id, touchFile = true) {
 
   // 這裡的就是該coser的全部照片了
   const photos = await getAllPhotosInfo(member_id, totalPages)
+  console.log('')
   // TODO 補充 member 其他info 的取得方式
   if (!photos.length) {
     console.log(`id ${member_id} 沒有任何照片!`)
