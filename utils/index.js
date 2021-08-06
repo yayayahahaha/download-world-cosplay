@@ -133,7 +133,6 @@ const folderDetect = (path = 'result') => {
 }
 
 async function touchCoserPhotosInfo(member_id) {
-  folderDetect()
   const photosNumber = await getTotalPhotosNumber(member_id)
   console.log(`總張數: ${photosNumber}`)
 
@@ -145,9 +144,13 @@ async function touchCoserPhotosInfo(member_id) {
   const photos = await getAllPhotosInfo(member_id, totalPages)
   console.log('')
 
-  // TODO 補充 member 其他info 的取得方式
-  const { member: { global_name } = {} } = photos[0] || {}
-  const coser = `${global_name || member_id}-${member_id}`
+  const [memberInfo, memberError] = await getUserInfo(member_id)
+  if (memberError) {
+    console.log('取得使用者資料失敗!')
+    return false
+  }
+  const { nickname, global_name } = memberInfo
+  const coser = `${nickname}${global_name || member_id}-${member_id}`
   const coserFolder = `result/${coser}`
   folderDetect(coserFolder)
 
@@ -274,6 +277,24 @@ async function fetchCoserPhotos(member_id) {
   return true
 }
 
+async function getUserInfo(member_id) {
+  const url = `https://worldcosplay.net/member/${member_id}`
+  const htmlString = await (await fetch(url, fetchConfig)).text()
+
+  try {
+    const ownerString = htmlString
+      .replace(/\r|\n/g, '')
+      .match(/const owner = \{.+\};/)[0]
+      .split('const owner = ')[1]
+      .split(';')[0]
+    fs.writeFileSync('result.json', ownerString)
+    const ownerInfo = JSON.parse(ownerString)
+    return [ownerInfo, null]
+  } catch (e) {
+    return [null, e]
+  }
+}
+
 module.exports = {
   hashCode,
   createUrl,
@@ -286,5 +307,6 @@ module.exports = {
   logPhotosInfo,
   ds,
   startDownload,
-  fetchCoserPhotos
+  fetchCoserPhotos,
+  getUserInfo
 }

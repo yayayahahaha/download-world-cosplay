@@ -4,11 +4,11 @@
 // TODO multi cosers: by search result or hand-in
 // cache: by cache-time(haven't checked yet), by folder info(ls -al stuff)
 
-const { fetchCoserPhotos } = require('./utils/index')
+const { fetchCoserPhotos, getUserInfo } = require('./utils/index')
 
 // coser world-cosplay
 /*135407 // Katsurayu */
 /*19139 // Neneko */
 
-// fetchCoserPhotos(1)
 fetchCoserPhotos(135407)
+// getUserInfo(135407).then(r => console.log(r))
