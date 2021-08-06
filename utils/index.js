@@ -126,8 +126,9 @@ const getAllPhotosInfo = async (member_id, totalPages) => {
   return flatResult
 }
 
-const folderDetect = () => {
-  if (!fs.existsSync('./result/')) fs.mkdirSync('./result/')
+const folderDetect = (path = 'result') => {
+  const folderPath = `./${path}/`
+  if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath)
 }
 
 module.exports = { hashCode, createUrl, getTotalPhotosNumber, basicUrl, getAllPhotosInfo, maxLimit, folderDetect }
