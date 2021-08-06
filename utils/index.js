@@ -253,6 +253,21 @@ async function startDownload(from, targetFolder) {
   }
 }
 
+async function fetchCoserPhotos(member_id) {
+  const info = await touchCoserPhotosInfo(member_id)
+
+  const { coser } = info
+  const result = await startDownload(`./result/${coser}/result.json`, `./result/${coser}/photos`)
+
+  const errorLog = result.map(({ data }) => data).filter(({ result }) => !result)
+  if (errorLog.length) {
+    folderDetect(`./result/${coser}/error-log`)
+    fs.writeFileSync(`./result/${coser}/error-log/${Date.now()}.json`, JSON.stringify(errorLog, null, 2))
+  }
+
+  return true
+}
+
 module.exports = {
   hashCode,
   createUrl,
@@ -264,5 +279,6 @@ module.exports = {
   touchCoserPhotosInfo,
   logPhotosInfo,
   ds,
-  startDownload
+  startDownload,
+  fetchCoserPhotos
 }
