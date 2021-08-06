@@ -34,17 +34,21 @@ const getTotalPhotosNumber = async (member_id = 135407, basicMax = 1, basicMin =
   console.log('')
 
   console.log('取得最大可能張數..')
-  const [max, min] = await _findMax(basicMax, basicMin)
+  const [max, min, error] = await _findMax(basicMax, basicMin)
+  if (error) return Promise.resolve(0)
+
   console.log(`最大可能張數: ${max}`)
   console.log('')
 
   async function _findMax(max, min) {
     return new Promise(async resolve => {
+      let error = null
       let getMaxCount = 0
       let resultMax = 0
       let resultMin = 0
       await _doFind(max, min)
-      resolve([resultMax, resultMin])
+      if (error) return resolve([null, null, error])
+      return resolve([resultMax, resultMin])
 
       async function _doFind(max, previous) {
         getMaxCount++
@@ -52,7 +56,13 @@ const getTotalPhotosNumber = async (member_id = 135407, basicMax = 1, basicMin =
         const url = createUrl(basicUrl, { member_id, limit: 1, page })
 
         console.log(`嘗試次數: ${getMaxCount}, 數目: ${page}`)
-        const hasMore = !!(await (await fetch(url)).json()).list.length
+        let hasMore
+        try {
+          hasMore = !!(await (await fetch(url)).json()).list.length
+        } catch (e) {
+          error = e
+          return
+        }
         if (hasMore) return _doFind(max * 2, max)
         resultMax = max
         resultMin = previous
@@ -134,6 +144,11 @@ const folderDetect = (path = 'result') => {
 
 async function touchCoserPhotosInfo(member_id) {
   const photosNumber = await getTotalPhotosNumber(member_id)
+  if (!photosNumber) {
+    console.log('取得總張數失敗!')
+    return { error: '取得總張數失敗!' }
+  }
+
   console.log(`總張數: ${photosNumber}`)
 
   const totalPages = Math.ceil(photosNumber / maxLimit)
@@ -147,7 +162,7 @@ async function touchCoserPhotosInfo(member_id) {
   const [memberInfo, memberError] = await getUserInfo(member_id)
   if (memberError) {
     console.log('取得使用者資料失敗!')
-    return false
+    return { error: '取得使用者資料失敗!' }
   }
   const { nickname, global_name } = memberInfo
   const coser = `${nickname}${global_name || member_id}-${member_id}`
@@ -260,7 +275,9 @@ async function startDownload(from, targetFolder) {
 async function fetchCoserPhotos(member_id) {
   const info = await touchCoserPhotosInfo(member_id)
 
-  const { coser } = info
+  const { coser, error } = info
+  if (error) return false
+
   const result = await startDownload(`./result/${coser}/result.json`, `./result/${coser}/photos`)
 
   folderDetect(`result/${coser}/error-log`)

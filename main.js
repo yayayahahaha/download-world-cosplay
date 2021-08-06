@@ -10,5 +10,10 @@ const { fetchCoserPhotos, getUserInfo } = require('./utils/index')
 /*135407 // Katsurayu */
 /*19139 // Neneko */
 
-fetchCoserPhotos(135407)
-// getUserInfo(135407).then(r => console.log(r))
+// fetchCoserPhotos(4444) // error!
+// fetchCoserPhotos(676767)
+// fetchCoserPhotos(135407)
+
+for (let i = 0; i < 10; i++) {
+  fetchCoserPhotos(i)
+}
