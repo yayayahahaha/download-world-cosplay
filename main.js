@@ -12,6 +12,11 @@ const page = 273
 
 const basicUrl = 'https://worldcosplay.net/api/member/photos.json'
 const basicQuery = { limit, member_id, page }
+const cookie =
+  '__cure_session=c7eb4febebf40d9e4df6bc396bef36e4; XSRF-TOKEN=IXk5pkI%2BhKf%2B81L6Yx9VT3JTWweDqpqvM1z5BbEABR8EB1x7aze2nvccdzJJtZRbrYJH8xHCX85FFPVeB9EOtQ%3D%3D'
+const fetchConfig = {
+  headers: { cookie }
+}
 
 // start
 ;(async function (member_id) {
@@ -27,7 +32,7 @@ const basicQuery = { limit, member_id, page }
     const url = createUrl(basicUrl, { limit: maxLimit, member_id, page })
 
     return async () => ({
-      result: await (await fetch(url)).json(),
+      result: await (await fetch(url, fetchConfig)).json(),
       sort: page
     })
   })
@@ -45,20 +50,6 @@ const basicQuery = { limit, member_id, page }
   // 這裡的就是該coser的全部照片了
   fs.writeFileSync('result.json', JSON.stringify(flatResult, null, 2))
 })(/*member_id*/ 28898)
-
-// start()
-async function start() {
-  const url = createUrl(basicUrl, basicQuery)
-  if (!url) return console.error('create url error')
-
-  const [response, error] = await ds(fetch(url))
-  if (error) return console.error(`fetch ${url} error`)
-
-  const [data, jsonError] = await ds(response.json())
-  if (jsonError) return console.error(`parse fetch ${url} response error`)
-
-  console.log(data.list.length, data.pager)
-}
 
 function createUrl(basicUrl = '', queryInput = '') {
   if (typeof basicUrl !== 'string') return null
