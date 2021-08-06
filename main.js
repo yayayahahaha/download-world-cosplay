@@ -14,6 +14,6 @@ const { fetchCoserPhotos, getUserInfo } = require('./utils/index')
 // fetchCoserPhotos(676767)
 // fetchCoserPhotos(135407)
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 20; i++) {
   fetchCoserPhotos(i)
 }

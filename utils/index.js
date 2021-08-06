@@ -131,7 +131,7 @@ const getAllPhotosInfo = async (member_id, totalPages) => {
   const flatResult = promiseResult
     .map(({ data }) => data)
     .sort((a, b) => a.sort - b.sort)
-    .reduce((list, { result: { list: resultList } }) => list.concat(resultList), [])
+    .reduce((list, { result: { list: resultList = [] } = {} } = {}) => list.concat(resultList), [])
     .filter(({ member_can_view }) => member_can_view)
 
   return flatResult
