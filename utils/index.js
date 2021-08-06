@@ -231,7 +231,8 @@ async function startDownload(from, targetFolder) {
 
     const taskList = list.map(item => {
       return function () {
-        const { id, name, url, type } = item
+        const { id, name: rayName, url, type } = item
+        const name = rayName.replace(/\//g, '_')
         const filePath = `${targetFolder}/${name}-${id}.${type}`
 
         return new Promise(async resolve => {
