@@ -1,6 +1,7 @@
 const qs = require('qs')
 const fetch = require('node-fetch')
 const { TaskSystem, download } = require('npm-flyc')
+const fs = require('fs')
 
 const ds = promise => promise.then(r => [r, null]).catch(e => [null, e])
 
@@ -12,9 +13,58 @@ const page = 273
 const basicUrl = 'https://worldcosplay.net/api/member/photos.json'
 const basicQuery = { limit, member_id, page }
 
-async function bisect(member_id = 135407, basicMax = 1, basicMin = 1) {
+// start
+;(async function (member_id) {
+  const maxLimit = 24
+
+  const photosNumber = await getTotalPhotosNumber(member_id, 273, 272)
+  console.log(`photosNumber: ${photosNumber}`)
+
+  const totalPages = Math.ceil(photosNumber / 24)
+  const promiseList = [...Array(totalPages)].map((nothing, index) => {
+    const page = index + 1
+    const url = createUrl(basicUrl, { limit: maxLimit, member_id, page })
+
+    return async () => await (await fetch(url)).json()
+  })
+
+  const taskNumber = 40
+  const task_search = new TaskSystem(promiseList, taskNumber)
+  const promiseResult = await task_search.doPromise()
+  const flatResult = promiseResult.reduce((list, { data: { list: resultList } }) => list.concat(resultList), [])
+  fs.writeFileSync('result.json', JSON.stringify(flatResult, null, 2))
+})(member_id)
+
+// start()
+async function start() {
+  const url = createUrl(basicUrl, basicQuery)
+  if (!url) return console.error('create url error')
+
+  const [response, error] = await ds(fetch(url))
+  if (error) return console.error(`fetch ${url} error`)
+
+  const [data, jsonError] = await ds(response.json())
+  if (jsonError) return console.error(`parse fetch ${url} response error`)
+
+  console.log(data.list.length, data.pager)
+}
+
+function createUrl(basicUrl = '', queryInput = '') {
+  if (typeof basicUrl !== 'string') return null
+  if (!/https?:\/\//.test(basicUrl)) return null
+
+  if (queryInput === null) return null
+  if (typeof queryInput !== 'string' && typeof queryInput !== 'object') return null
+
+  let query = typeof queryInput === 'object' ? qs.stringify(queryInput) : queryInput
+  query.replace(/^\?/, '')
+
+  return `${basicUrl}?${query}`
+}
+
+async function getTotalPhotosNumber(member_id = 135407, basicMax = 1, basicMin = 1) {
   if (Number(basicMin > basicMax)) {
-    console.error('bisect: min 不可大於 max')
+    console.error('getTotalPhotosNumber: min 不可大於 max')
     return null
   }
 
@@ -88,35 +138,4 @@ async function bisect(member_id = 135407, basicMax = 1, basicMin = 1) {
       }
     }
   })
-}
-;(async function () {
-  const result = await bisect(member_id)
-  console.log(result)
-})()
-
-// start()
-async function start() {
-  const url = createUrl(basicUrl, basicQuery)
-  if (!url) return console.error('create url error')
-
-  const [response, error] = await ds(fetch(url))
-  if (error) return console.error(`fetch ${url} error`)
-
-  const [data, jsonError] = await ds(response.json())
-  if (jsonError) return console.error(`parse fetch ${url} response error`)
-
-  console.log(data.list.length, data.pager)
-}
-
-function createUrl(basicUrl = '', queryInput = '') {
-  if (typeof basicUrl !== 'string') return null
-  if (!/https?:\/\//.test(basicUrl)) return null
-
-  if (queryInput === null) return null
-  if (typeof queryInput !== 'string' && typeof queryInput !== 'object') return null
-
-  let query = typeof queryInput === 'object' ? qs.stringify(queryInput) : queryInput
-  query.replace(/^\?/, '')
-
-  return `${basicUrl}?${query}`
 }
