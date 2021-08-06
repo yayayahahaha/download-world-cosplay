@@ -17,23 +17,32 @@ const basicQuery = { limit, member_id, page }
 ;(async function (member_id) {
   const maxLimit = 24
 
-  const photosNumber = await getTotalPhotosNumber(member_id, 273, 272)
+  const photosNumber = await getTotalPhotosNumber(member_id)
   console.log(`photosNumber: ${photosNumber}`)
 
   const totalPages = Math.ceil(photosNumber / 24)
+
   const promiseList = [...Array(totalPages)].map((nothing, index) => {
     const page = index + 1
     const url = createUrl(basicUrl, { limit: maxLimit, member_id, page })
 
-    return async () => await (await fetch(url)).json()
+    return async () => ({
+      result: await (await fetch(url)).json(),
+      sort: page
+    })
   })
 
   const taskNumber = 40
   const task_search = new TaskSystem(promiseList, taskNumber)
   const promiseResult = await task_search.doPromise()
-  const flatResult = promiseResult.reduce((list, { data: { list: resultList } }) => list.concat(resultList), [])
+  const flatResult = promiseResult
+    .map(({ data }) => data)
+    .sort((a, b) => a.sort - b.sort)
+    .reduce((list, { result: { list: resultList } }) => list.concat(resultList), [])
+
+  // 這裡的就是該coser的全部照片了
   fs.writeFileSync('result.json', JSON.stringify(flatResult, null, 2))
-})(member_id)
+})(/*member_id*/ 28898)
 
 // start()
 async function start() {
