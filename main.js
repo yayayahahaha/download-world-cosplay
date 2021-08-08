@@ -12,8 +12,4 @@ const { fetchCoserPhotos, getUserInfo } = require('./utils/index')
 
 // fetchCoserPhotos(4444) // error!
 // fetchCoserPhotos(676767)
-// fetchCoserPhotos(135407)
-
-for (let i = 0; i < 20; i++) {
-  fetchCoserPhotos(i)
-}
+fetchCoserPhotos(135407)

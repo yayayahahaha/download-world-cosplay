@@ -273,6 +273,8 @@ async function startDownload(from, targetFolder) {
 }
 
 async function fetchCoserPhotos(member_id) {
+  folderDetect()
+
   const info = await touchCoserPhotosInfo(member_id)
 
   const { coser, error } = info
