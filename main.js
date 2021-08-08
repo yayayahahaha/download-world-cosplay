@@ -13,3 +13,7 @@ const { fetchCoserPhotos, getUserInfo } = require('./utils/index')
 // fetchCoserPhotos(4444) // error!
 // fetchCoserPhotos(676767)
 fetchCoserPhotos(135407)
+;[...Array(2)].forEach((nothing, index) => {
+  const memberId = index + 1
+  fetchCoserPhotos(memberId)
+})
